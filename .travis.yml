@@ -25,7 +25,6 @@ before_script:
   - R CMD INSTALL .
   - R -e 'tensorflow::install_tensorflow(version = "1.11.0", extra_packages="IPython")'
   - R -e 'tensorflow::tf_config()'
-  - R -e 'devtools::install_github("jonathanbratt/RBERT")'
 
 after_success:
   - Rscript -e 'covr::codecov()'
