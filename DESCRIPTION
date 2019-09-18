@@ -1,0 +1,46 @@
+Package: RBERTviz
+Type: Package
+Title: Visualization Tools for RBERT
+Version: 0.1.0
+Authors@R: c(
+    person("Jonathan", "Bratt", email = "jonathan.bratt@macmillan.com", 
+           role = c("aut", "cre", "trl")
+    ),
+    person("Jon", "Harmon", email = "jon.harmon@macmillan.com", 
+           role = c("aut")
+    ),
+    person("Jesse", "Vig", role = c("ctb", "cph", "org"),
+          comment = c("Author of bertviz",
+                      "https://arxiv.org/abs/1906.05714",
+                      "https://github.com/jessevig/bertviz/")
+    ),
+    person("Google Inc.", role = c("ctb", "cph", "org"),
+           comment = "Original tensor2tensor visualization code")
+    )
+Description: Visualize attention weights and output vectors from BERT.
+Depends: R (>= 3.5.1)
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/jonathanbratt/RBERTviz
+BugReports: https://github.com/jonathanbratt/RBERTviz/issues
+RoxygenNote: 6.1.1
+Imports:
+    dplyr (>= 0.8.3),
+    ggplot2 (>= 3.2.1),
+    htmltools (>= 0.3.6),
+    htmlwidgets (>= 1.3),
+    magrittr (>= 1.5),
+    purrr (>= 0.3.2),
+    r2d3 (>= 0.2.3),
+    RColorBrewer (>= 1.1.2),
+    rmarkdown (>= 1.14),
+    tibble (>= 2.1.3)
+Suggests:
+    RBERT (>= 0.1.5),
+    gganimate (>= 1.0.3),
+    testthat (>= 2.1.0),
+    useful (>= 1.2.6),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
