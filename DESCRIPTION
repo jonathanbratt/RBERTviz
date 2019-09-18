@@ -43,6 +43,5 @@ Suggests:
     useful (>= 1.2.6),
     knitr,
     rmarkdown
-Remotes: 
-    github::jonathanbratt/RBERT
+Remotes: github::jonathanbratt/RBERT
 VignetteBuilder: knitr
