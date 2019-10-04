@@ -42,6 +42,7 @@ Suggests:
     testthat (>= 2.1.0),
     useful (>= 1.2.6),
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 Remotes: github::jonathanbratt/RBERT
 VignetteBuilder: knitr
