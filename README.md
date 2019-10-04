@@ -33,7 +33,11 @@ RBERTviz currently enables visualization of
 
 The attention visualizer is basically a wrapper around an earlier version of the [transformer visualization tools](https://github.com/tensorflow/tensor2tensor/tree/master/tensor2tensor/visualization), as adapted by [Jesse Vig](https://github.com/jessevig/bertviz/).
 
+![Chicken](man/attention1.png) ![Road](man/attention2.png)
+
 The output vector visualizer is a collection of routines for generating 2D PCA plots of the layer outputs, which can be interpreted as context-dependent embedding vectors.
+
+![Train](man/embeddings_layers_animation.gif)
 
 See the "Introduction to RBERTviz" vignette included with the package for more detailed examples of usage.
 
