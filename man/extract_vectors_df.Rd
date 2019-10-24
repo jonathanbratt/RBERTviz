@@ -16,10 +16,10 @@ The embedding vector components as a tbl_df, for all tokens and all
 }
 \description{
 Extract the embedding vector values from output of
-\code{\link[RBERT]{extract_features}}. The resulting tbl_df will typically have a
-large number of columns (> 768), so it will be rather slow to \code{\link{View}}.
-Consider using \code{\link[dplyr]{glimpse}} or \code{\link[useful]{corner}}
-if you just want to peek at the values.
+\code{\link[RBERT]{extract_features}}. The resulting tbl_df will typically
+have a large number of columns (> 768), so it will be rather slow to
+\code{\link{View}}. Consider using \code{\link[dplyr]{glimpse}} or
+\code{\link[useful]{corner}} if you just want to peek at the values.
 }
 \examples{
 \dontrun{

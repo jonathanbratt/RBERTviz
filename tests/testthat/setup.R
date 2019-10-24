@@ -20,7 +20,7 @@ print(paste0("setting up checkpoint dir: ", temp_checkpoint_dir))
 
 BERT_PRETRAINED_DIR <- RBERT::download_BERT_checkpoint(
     model = "bert_base_uncased",
-    destination = temp_checkpoint_dir
+    dir = temp_checkpoint_dir
 )
 vocab_file <- file.path(BERT_PRETRAINED_DIR, 'vocab.txt')
 init_checkpoint <- file.path(BERT_PRETRAINED_DIR, 'bert_model.ckpt')

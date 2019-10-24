@@ -1,7 +1,7 @@
 Package: RBERTviz
 Type: Package
 Title: Visualization Tools for RBERT
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Jonathan", "Bratt", email = "jonathan.bratt@macmillan.com", 
            role = c("aut", "cre", "trl")
@@ -37,12 +37,11 @@ Imports:
     rmarkdown (>= 1.14),
     tibble (>= 2.1.3)
 Suggests:
-    RBERT (>= 0.1.5),
+    RBERT (>= 0.1.6),
     gganimate (>= 1.0.3),
     testthat (>= 2.1.0),
     useful (>= 1.2.6),
     knitr,
-    rmarkdown,
     covr
 Remotes: github::jonathanbratt/RBERT
 VignetteBuilder: knitr
