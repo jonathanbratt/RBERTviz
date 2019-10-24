@@ -17,10 +17,10 @@
 #' Extract Embedding Vectors
 #'
 #' Extract the embedding vector values from output of
-#' \code{\link[RBERT]{extract_features}}. The resulting tbl_df will typically have a
-#' large number of columns (> 768), so it will be rather slow to \code{\link{View}}.
-#' Consider using \code{\link[dplyr]{glimpse}} or \code{\link[useful]{corner}}
-#' if you just want to peek at the values.
+#' \code{\link[RBERT]{extract_features}}. The resulting tbl_df will typically
+#' have a large number of columns (> 768), so it will be rather slow to
+#' \code{\link{View}}. Consider using \code{\link[dplyr]{glimpse}} or
+#' \code{\link[useful]{corner}} if you just want to peek at the values.
 #'
 #' @param layer_outputs The \code{layer_outputs} component of
 #'   \code{\link[RBERT]{extract_features}} output.
@@ -138,7 +138,7 @@ extract_vectors_df <- function(layer_outputs) {
 
 
 
-# filter_layer_embeddings ----------------------------------------------------------
+# filter_layer_embeddings ------------------------------------------------------
 
 
 #' Filter and Combine Embedding Vectors

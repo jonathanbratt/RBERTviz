@@ -30,7 +30,6 @@ You can install RBERTviz from [GitHub](https://github.com/) with:
 
 ```{r installation, eval = FALSE}
 # install.packages("devtools")
-# Set up a GITHUB_PAT with Sys.setenv(GITHUB_PAT = "YOURPATHERE")
 devtools::install_github(
   "jonathanbratt/RBERTviz", 
   build_vignettes = TRUE
