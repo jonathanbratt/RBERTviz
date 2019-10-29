@@ -26,9 +26,11 @@ test_that("format_attention and visualize_attention works", {
                                       vocab_file = vocab_file,
                                       bert_config_file = bert_config_file,
                                       init_checkpoint = init_checkpoint,
-                                      layer_indexes = 1:12,
-                                      batch_size = 2L)
-    attn1 <- format_attention(feats_chicken$attention_probs, seq_num = 1)
+                                      layer_indexes = 0:12,
+                                      batch_size = 2L,
+                                      features = c("output",
+                                                   "attention_arrays"))
+    attn1 <- format_attention(feats_chicken$attention_arrays, seq_num = 1)
     testthat::expect_identical(names(attn1), c("all", "a", "b", "ab", "ba"))
     testthat::expect_identical(attn1$all$top_text[[15]], "tired")
     testthat::expect_identical(length(attn1$all$att), 12L)  # 12 layers
@@ -41,11 +43,11 @@ test_that("format_attention and visualize_attention works", {
     testthat::expect_s3_class(va1, "htmlwidget")
     testthat::expect_identical(va1$x, attn1)
 
-    attn3 <- format_attention(feats_chicken$attention_probs, seq_num = 3)
+    attn3 <- format_attention(feats_chicken$attention_arrays, seq_num = 3)
     testthat::expect_identical(length(attn3$ab$top_text), 10L) # 10 tokens
     testthat::expect_identical(length(attn3$ab$bot_text), 8L) # 8 tokens
 
-    embeddings <- extract_vectors_df(feats_chicken$layer_outputs)
+    embeddings <- feats_chicken$output
     testthat::expect_identical(dim(embeddings), c(676L, 773L))
 
     embeddings2 <- filter_layer_embeddings(embeddings, layer_indices = 12L,

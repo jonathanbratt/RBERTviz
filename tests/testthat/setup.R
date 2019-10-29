@@ -12,16 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-temp_checkpoint_dir <- tempdir()
-print(paste0("setting up checkpoint dir: ", temp_checkpoint_dir))
+use_temp <- FALSE
+
+# Comment this for faster tests. Be sure to uncomment before submitting a PR.
+use_temp <- TRUE
+
+checkpoint_main_dir <- NULL
+
+if (use_temp) {
+  checkpoint_main_dir <- tempdir()
+  print(paste0("setting up checkpoint dir: ", checkpoint_main_dir))
+}
+
+clean_up_cp <- !RBERT:::.has_checkpoint(
+  "bert_base_uncased",
+  dir = checkpoint_main_dir
+)
 
 # We need the checkpoint to be available for the other tests, so download it
 # here.
-
 BERT_PRETRAINED_DIR <- RBERT::download_BERT_checkpoint(
-    model = "bert_base_uncased",
-    dir = temp_checkpoint_dir
+  model = "bert_base_uncased",
+  dir = checkpoint_main_dir
 )
+
 vocab_file <- file.path(BERT_PRETRAINED_DIR, 'vocab.txt')
 init_checkpoint <- file.path(BERT_PRETRAINED_DIR, 'bert_model.ckpt')
 bert_config_file <- file.path(BERT_PRETRAINED_DIR, 'bert_config.json')

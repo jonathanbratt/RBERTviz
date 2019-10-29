@@ -4,11 +4,11 @@
 \alias{format_attention}
 \title{Format BERT Attention Weights for Visualizing}
 \usage{
-format_attention(att_mat, seq_num = 1)
+format_attention(attention_arrays, seq_num = 1)
 }
 \arguments{
-\item{att_mat}{The "attention_probs" component of the output from
-\code{RBERT::extract_features()} (details to come).}
+\item{attention_arrays}{The "attention_arrays" component of the output from
+\code{\link[RBERT]{extract_features}(..., features = "attention_arrays")}.}
 
 \item{seq_num}{Integer; which example sequence from the input to visualize.}
 }
