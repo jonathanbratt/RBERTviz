@@ -1,7 +1,7 @@
 Package: RBERTviz
 Type: Package
 Title: Visualization Tools for RBERT
-Version: 0.1.1
+Version: 0.2
 Authors@R: c(
     person("Jonathan", "Bratt", email = "jonathan.bratt@macmillan.com", 
            role = c("aut", "cre", "trl")
