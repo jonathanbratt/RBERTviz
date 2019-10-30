@@ -8,8 +8,8 @@ filter_layer_embeddings(embedding_df, layer_indices = 12L,
   sum_fun = mean)
 }
 \arguments{
-\item{embedding_df}{A tbl_df of embedding vectors; the output of
-\code{\link{extract_vectors_df}}.}
+\item{embedding_df}{A tbl_df of embedding vectors; the "output" component of
+\code{\link[RBERT]{extract_features}}.}
 
 \item{layer_indices}{Integer vector; which layers embeddings to keep.}
 
@@ -34,7 +34,7 @@ layers.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-embeddings <- extract_vectors_df(feats$layer_outputs)
+embeddings <- feats$output
 embeddings_layer1 <- embeddings \%>\%
     filter_layer_embeddings(layer_indices = 1L)
 # To keep the layer_index column, use sum_fun = NULL:

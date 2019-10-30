@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-unlink(BERT_PRETRAINED_DIR, recursive = TRUE)
+if (clean_up_cp) unlink(BERT_PRETRAINED_DIR, recursive = TRUE)

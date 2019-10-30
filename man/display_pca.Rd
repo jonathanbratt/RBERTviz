@@ -9,7 +9,7 @@ display_pca(embedding_df, color_field = NULL,
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of
-\code{\link{extract_vectors_df}}.}
+\code{\link[RBERT]{extract_featues}}.}
 
 \item{color_field}{Character scalar; optional column name to assign to color
 aesthetic in the plot.}
@@ -37,8 +37,7 @@ Display a 2D PCA plot of a collection of embedding vectors.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-embeddings <- extract_vectors_df(feats$layer_outputs)
-embeddings \%>\%
+feats$output \%>\%
     filter_layer_embeddings(layer_indices = 12L) \%>\%
     keep_tokens("[CLS]") \%>\%
     display_pca()

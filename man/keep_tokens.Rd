@@ -8,7 +8,7 @@ keep_tokens(embedding_df, tokens = "[CLS]")
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of
-\code{\link{extract_vectors_df}}.}
+\code{\link[RBERT]{extract_featues}}.}
 
 \item{tokens}{Character vector; which tokens to keep.}
 }
@@ -24,8 +24,7 @@ Keeps only specified tokens in the given table of embeddings.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-embeddings <- extract_vectors_df(feats$layer_outputs)
-embeddings_layer12_cls <- embeddings \%>\%
+embeddings_layer12_cls <- feats$output \%>\%
     filter_layer_embeddings(layer_indices = 12L) \%>\%
     keep_tokens("[CLS]")
 }

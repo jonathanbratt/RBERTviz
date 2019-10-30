@@ -20,8 +20,8 @@
 #' Given data from an RBERT model, format the attention weights matrices in the
 #' structure expected by the javascript visualization code.
 #'
-#' @param att_mat The "attention_probs" component of the output from
-#'   \code{RBERT::extract_features()} (details to come).
+#' @param attention_arrays The "attention_arrays" component of the output from
+#'   \code{\link[RBERT]{extract_features}(..., features = "attention_arrays")}.
 #' @param seq_num Integer; which example sequence from the input to visualize.
 #'
 #' @return an object structured appropriately for input (as eventual json) to
@@ -35,9 +35,9 @@
 #' # Then:
 #' attn <- format_attention(feats$attention_probs)
 #' }
-format_attention <- function(att_mat, seq_num = 1) {
+format_attention <- function(attention_arrays, seq_num = 1) {
     seq_key <- paste0("example_", seq_num)
-    this_seq_data <- att_mat[[seq_key]]
+    this_seq_data <- attention_arrays[[seq_key]]
     token_list <- this_seq_data$sequence
     split_seq <- split_sequences(token_list)
     a_len <- length(split_seq$a_text)

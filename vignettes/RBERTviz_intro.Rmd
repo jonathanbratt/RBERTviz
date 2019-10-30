@@ -64,9 +64,11 @@ feats_chicken <- RBERT::extract_features(examples = chicken_ex,
                                          vocab_file = vocab_file,
                                          bert_config_file = bert_config_file,
                                          init_checkpoint = init_checkpoint,
-                                         layer_indexes = 1:12,
-                                         batch_size = 2L)
-attn1 <- format_attention(feats_chicken$attention_probs, seq_num = 1)
+                                         layer_indexes = 0:12,
+                                         batch_size = 2L,
+                                         features = c("output",
+                                                      "attention_arrays"))
+attn1 <- format_attention(feats_chicken$attention_arrays, seq_num = 1)
 visualize_attention(attn1)
 ```
 
@@ -96,12 +98,11 @@ Now look at the same head for the second sentence, where "it" refers to the
 road, not the chicken. 
 
 ```{r, eval=FALSE}
-attn2 <- format_attention(feats_chicken$attention_probs, seq_num = 2)
+attn2 <- format_attention(feats_chicken$attention_arrays, seq_num = 2)
 visualize_attention(attn2)
 ```
 
-Again, the attention weights reflect the correct
-antecedent for the pronoun.
+Again, the attention weights reflect the correct antecedent for the pronoun.
 
 ```{r, echo=FALSE}
 knitr::include_graphics("attention2.png", dpi=120)
@@ -123,8 +124,10 @@ feats_chicken2 <- RBERT::extract_features(examples = chicken_ex2,
                                          bert_config_file = bert_config_file,
                                          init_checkpoint = init_checkpoint,
                                          layer_indexes = 1:12,
-                                         batch_size = 2L)
-attn <- format_attention(feats_chicken2$attention_probs, seq_num = 2)
+                                         batch_size = 2L,
+                                         features = c("output",
+                                                      "attention_arrays"))
+attn <- format_attention(feats_chicken2$attention_arrays, seq_num = 2)
 visualize_attention(attn)
 ```
 
@@ -155,7 +158,7 @@ above. First, get the vectors in a convenient format:
 ```{r, eval=FALSE}
 # Create a dataframe containing the token vectors from each layer,
 # as well as the vectors input to layer 1 (indicated here by layer_index = 0).
-embeddings <- extract_vectors_df(feats_chicken$layer_outputs)
+embeddings <- feats_chicken$output
 
 # Let's look at the last (12th) layer outputs...
 embeddings_l12 <- filter_layer_embeddings(embeddings, layer_indices = 12L)
@@ -212,7 +215,7 @@ from those that refer to roads.
 
 ```{r, eval=FALSE}
 embeddings_l12_select <- embeddings_l12_select %>% 
-    mutate(class = c("bird", "road", "bird",
+    dplyr::mutate(class = c("bird", "road", "bird",
                      "bird", "road", "road"))
 display_pca(embeddings_l12_select, color_field = "class")
 ```
@@ -289,11 +292,11 @@ feats_train <- RBERT::extract_features(
     vocab_file = vocab_file,
     bert_config_file = bert_config_file,
     init_checkpoint = init_checkpoint,
-    layer_indexes = 1:12,
+    layer_indexes = 0:12,
     batch_size = 2L)
 
 # Extract the feature vectors from the result.
-train_embeddings_df <- extract_vectors_df(feats_train$layer_outputs)
+train_embeddings_df <- feats_train$output
 # Display the input vectors (before any layers of BERT).
 train_embeddings_df %>% 
     filter_layer_embeddings(layer_indices = 0L) %>% 

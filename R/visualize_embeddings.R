@@ -12,132 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# extract_vectors_df ---------------------------------------------------------
-
-#' Extract Embedding Vectors
-#'
-#' Extract the embedding vector values from output of
-#' \code{\link[RBERT]{extract_features}}. The resulting tbl_df will typically
-#' have a large number of columns (> 768), so it will be rather slow to
-#' \code{\link{View}}. Consider using \code{\link[dplyr]{glimpse}} or
-#' \code{\link[useful]{corner}} if you just want to peek at the values.
-#'
-#' @param layer_outputs The \code{layer_outputs} component of
-#'   \code{\link[RBERT]{extract_features}} output.
-#'
-#' @return The embedding vector components as a tbl_df, for all tokens and all
-#'   layers.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # assuming something like the following has been run:
-#' # feats <- RBERT::extract_features(...) # See RBERT documentation
-#' # Then:
-#' embeddings <- extract_vectors_df(feats$layer_outputs)
-#' }
-extract_vectors_df <- function(layer_outputs) {
-    vals <- .extract_values(layer_outputs)
-    labs <- .extract_labels(layer_outputs)
-    return(dplyr::bind_cols(labs, vals))
-}
-
-
-
-
-
-# extract embeddings values and labels ----------------------------------------
-
-#' Extract Embeddings
-#'
-#' Extract the embedding vector values from output of
-#' \code{\link[RBERT]{extract_features}}. The columns identifying example
-#' sequence, segment, token, and row are extracted separately, by
-#' \code{.extract_labels}.
-#'
-#' @param layer_outputs The \code{layer_outputs} component of
-#'   \code{\link[RBERT]{extract_features}} output.
-#'
-#' @return The embedding vector components as a tbl_df, for all tokens and all
-#'   layers.
-#' @keywords internal
-#' @noRd
-.extract_values <- function(layer_outputs) {
-    vec_len <- length(
-        layer_outputs$example_1$features$token_1$layers[[1]]$values
-    )
-    tmat <- purrr::map(
-        layer_outputs,
-        function(seq_data) {
-            tmat2 <- purrr::map(
-                seq_along(seq_data$features),
-                function(tok_index) {
-                    tok_data <- seq_data$features[[tok_index]]
-                    t(vapply(
-                        tok_data$layers,
-                        function(layer_data) {layer_data$values},
-                        FUN.VALUE = numeric(vec_len) ))
-                })
-            do.call(rbind, tmat2)
-        })
-    tmat <- do.call(rbind, tmat)
-    colnames(tmat) <- paste0("V", seq_len(vec_len))
-    return(tibble::as_tibble(tmat))
-}
-
-#' Extract Labels for Embeddings
-#'
-#' Extract the label columns for embedding vector values from output of
-#' \code{\link[RBERT]{extract_features}}.
-#'
-#' @param layer_outputs The \code{layer_outputs} component of
-#'   \code{\link[RBERT]{extract_features}} output.
-#'
-#' @return The embedding vector components as a tbl_df, for all tokens and all
-#'   layers.
-#' @keywords internal
-#' @noRd
-.extract_labels <- function(layer_outputs) {
-    lab_df <- purrr::map_dfr(
-        layer_outputs,
-        function(ex_data) {
-            purrr::map_dfr(
-                seq_along(ex_data$features),
-                function(tok_index) {
-                    tok_data <- ex_data$features[[tok_index]]
-                    purrr::map_dfr(
-                        tok_data$layers,
-                        function(layer_data) {
-                            layer_index <- layer_data$index
-                            ex_index <- ex_data$linex_index
-                            tok_str <- tok_data$token
-                            tib <- tibble::tibble(sequence_index = ex_index,
-                                                  token_index = tok_index,
-                                                  token = tok_str,
-                                                  layer_index = layer_index)
-                        })
-                })
-        })
-    # We want to add a column to index which segment (within each example
-    # sequence; either 1 or 2) each token belongs to. By the time we get to this
-    # point in the process, the only way to identify tokens in the second
-    # segment is the rule that every token after the first [SEP] token is in the
-    # second segment.
-    lab_df <- lab_df %>%
-        dplyr::mutate(is_sep = token == "[SEP]") %>%
-        dplyr::group_by(sequence_index, layer_index) %>%
-        dplyr::mutate(segment_index = cumsum(is_sep) - is_sep + 1) %>%
-        dplyr::select(sequence_index,
-                      segment_index,
-                      token_index,
-                      token,
-                      layer_index) %>%
-        dplyr::ungroup()
-    return(lab_df)
-}
-
-
-
 # filter_layer_embeddings ------------------------------------------------------
 
 
@@ -147,8 +21,8 @@ extract_vectors_df <- function(layer_outputs) {
 #' filter to specific layer outputs, or to average the outputs from multiple
 #' layers.
 #'
-#' @param embedding_df A tbl_df of embedding vectors; the output of
-#'   \code{\link{extract_vectors_df}}.
+#' @param embedding_df A tbl_df of embedding vectors; the "output" component of
+#'   \code{\link[RBERT]{extract_features}}.
 #' @param layer_indices Integer vector; which layers embeddings to keep.
 #' @param sum_fun A summarizing function to apply to the embedding vector
 #'   components of the retained layers. Will be passed as the \code{.funs}
@@ -166,7 +40,7 @@ extract_vectors_df <- function(layer_outputs) {
 #' # assuming something like the following has been run:
 #' # feats <- RBERT::extract_features(...) # See RBERT documentation
 #' # Then:
-#' embeddings <- extract_vectors_df(feats$layer_outputs)
+#' embeddings <- feats$output
 #' embeddings_layer1 <- embeddings %>%
 #'     filter_layer_embeddings(layer_indices = 1L)
 #' # To keep the layer_index column, use sum_fun = NULL:
@@ -211,7 +85,7 @@ filter_layer_embeddings <- function(embedding_df,
 #' Keeps only specified tokens in the given table of embeddings.
 #'
 #' @param embedding_df A tbl_df of embedding vectors; the output of
-#'   \code{\link{extract_vectors_df}}.
+#'   \code{\link[RBERT]{extract_featues}}.
 #' @param tokens Character vector; which tokens to keep.
 #'
 #' @return The input tbl_df of embedding vectors, with the specified filtering
@@ -223,8 +97,7 @@ filter_layer_embeddings <- function(embedding_df,
 #' # assuming something like the following has been run:
 #' # feats <- RBERT::extract_features(...) # See RBERT documentation
 #' # Then:
-#' embeddings <- extract_vectors_df(feats$layer_outputs)
-#' embeddings_layer12_cls <- embeddings %>%
+#' embeddings_layer12_cls <- feats$output %>%
 #'     filter_layer_embeddings(layer_indices = 12L) %>%
 #'     keep_tokens("[CLS]")
 #' }
@@ -243,7 +116,7 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #' Display a 2D PCA plot of a collection of embedding vectors.
 #'
 #' @param embedding_df A tbl_df of embedding vectors; the output of
-#'   \code{\link{extract_vectors_df}}.
+#'   \code{\link[RBERT]{extract_featues}}.
 #' @param class Character vector; which tokens to keep.
 #' @param color_field Character scalar; optional column name to assign to color
 #'   aesthetic in the plot.
@@ -264,8 +137,7 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #' # assuming something like the following has been run:
 #' # feats <- RBERT::extract_features(...) # See RBERT documentation
 #' # Then:
-#' embeddings <- extract_vectors_df(feats$layer_outputs)
-#' embeddings %>%
+#' feats$output %>%
 #'     filter_layer_embeddings(layer_indices = 12L) %>%
 #'     keep_tokens("[CLS]") %>%
 #'     display_pca()

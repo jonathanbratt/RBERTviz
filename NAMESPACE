@@ -2,7 +2,6 @@
 
 export("%>%")
 export(display_pca)
-export(extract_vectors_df)
 export(filter_layer_embeddings)
 export(format_attention)
 export(keep_tokens)
