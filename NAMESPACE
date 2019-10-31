@@ -3,7 +3,6 @@
 export("%>%")
 export(display_pca)
 export(filter_layer_embeddings)
-export(format_attention)
 export(keep_tokens)
 export(renderVisualize_attention)
 export(visualize_attention)

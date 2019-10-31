@@ -9,7 +9,7 @@ display_pca(embedding_df, color_field = NULL,
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of
-\code{\link[RBERT]{extract_featues}}.}
+\code{\link[RBERT]{extract_features}}.}
 
 \item{color_field}{Character scalar; optional column name to assign to color
 aesthetic in the plot.}

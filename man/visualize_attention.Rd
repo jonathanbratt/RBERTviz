@@ -4,11 +4,15 @@
 \alias{visualize_attention}
 \title{Visualize BERT Attention Weights}
 \usage{
-visualize_attention(attn_obj, width = NULL, height = NULL,
-  elementId = NULL)
+visualize_attention(attention, sequence_index = 1, width = NULL,
+  height = NULL, elementId = NULL)
 }
 \arguments{
-\item{attn_obj}{Output from \code{format_attention()} (details to come).}
+\item{attention}{The "attention" component of the output from
+\code{\link[RBERT]{extract_features}(..., features = "attention")}.}
+
+\item{sequence_index}{Integer; which example sequence from the input to
+visualize.}
 
 \item{height, width}{Characters; height and width of the htmlwidget
 specified in any valid \code{CSS} size unit.}
@@ -27,7 +31,6 @@ attention weights.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-attn <- format_attention(feats$attention_probs)
-visualize_attention(attn)
+visualize_attention(feats$attention)
 }
 }

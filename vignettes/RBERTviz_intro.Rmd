@@ -67,9 +67,8 @@ feats_chicken <- RBERT::extract_features(examples = chicken_ex,
                                          layer_indexes = 0:12,
                                          batch_size = 2L,
                                          features = c("output",
-                                                      "attention_arrays"))
-attn1 <- format_attention(feats_chicken$attention_arrays, seq_num = 1)
-visualize_attention(attn1)
+                                                      "attention"))
+visualize_attention(feats_chicken$attention, sequence_index = 1)
 ```
 
 Running the above commands will produce an interactive display in the "Viewer"
@@ -98,8 +97,7 @@ Now look at the same head for the second sentence, where "it" refers to the
 road, not the chicken. 
 
 ```{r, eval=FALSE}
-attn2 <- format_attention(feats_chicken$attention_arrays, seq_num = 2)
-visualize_attention(attn2)
+visualize_attention(feats_chicken$attention, sequence_index = 2)
 ```
 
 Again, the attention weights reflect the correct antecedent for the pronoun.
@@ -126,9 +124,8 @@ feats_chicken2 <- RBERT::extract_features(examples = chicken_ex2,
                                          layer_indexes = 1:12,
                                          batch_size = 2L,
                                          features = c("output",
-                                                      "attention_arrays"))
-attn <- format_attention(feats_chicken2$attention_arrays, seq_num = 2)
-visualize_attention(attn)
+                                                      "attention"))
+visualize_attention(feats_chicken2$attention, sequence_index = 2)
 ```
 
 Selecting "Sentence A -> Sentence B" from the "Attention" dropdown produces a

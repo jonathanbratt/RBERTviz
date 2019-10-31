@@ -20,149 +20,129 @@
 #' Given data from an RBERT model, format the attention weights matrices in the
 #' structure expected by the javascript visualization code.
 #'
-#' @param attention_arrays The "attention_arrays" component of the output from
-#'   \code{\link[RBERT]{extract_features}(..., features = "attention_arrays")}.
-#' @param seq_num Integer; which example sequence from the input to visualize.
+#' @inheritParams visualize_attention
 #'
 #' @return an object structured appropriately for input (as eventual json) to
 #'   the javascript visualization code.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # assuming something like the following has been run:
-#' # feats <- RBERT::extract_features(...) # See RBERT documentation
-#' # Then:
-#' attn <- format_attention(feats$attention_probs)
-#' }
-format_attention <- function(attention_arrays, seq_num = 1) {
-    seq_key <- paste0("example_", seq_num)
-    this_seq_data <- attention_arrays[[seq_key]]
-    token_list <- this_seq_data$sequence
-    split_seq <- split_sequences(token_list)
-    a_len <- length(split_seq$a_text)
-    b_len <- length(split_seq$b_text)
+#' @keywords internal
+.format_attention <- function(attention, sequence_index = 1) {
+  in_seq_index <- sequence_index
+  this_seq_data <- attention %>%
+    dplyr::filter(sequence_index == in_seq_index) %>%
+    dplyr::select(
+      layer_index, head_index,
+      segment_index,
+      token_index, token,
+      attention_segment_index,
+      attention_token_index, attention_token,
+      attention_weight
+    )
 
-    all_att_mat <- this_seq_data[grepl(names(this_seq_data),
-                                       pattern = "attention")]
+  token_list_a <- .get_attention_tokens(this_seq_data, 1)
+  token_list_b <- .get_attention_tokens(this_seq_data, 2)
+  token_list <- c(token_list_a, token_list_b)
 
-    # make one piece at a time...
-    all_list <- list("att" = convert_attention_matrix(all_att_mat),
-                     "top_text" = as.list(token_list),
-                     "bot_text" = as.list(token_list))
-
-    a_att_mat <- purrr::map(all_att_mat, function(att_ten) {
-        att_ten[ , 1:a_len, 1:a_len]
-    })
-    a_list <- list("att" = convert_attention_matrix(a_att_mat),
-                   "top_text" = split_seq$a_text,
-                   "bot_text" = split_seq$a_text)
-
-    b_att_mat <- purrr::map(all_att_mat, function(att_ten) {
-        if (b_len > 0 ) {
-            att_ten[ , (a_len+1):(a_len+b_len), (a_len+1):(a_len+b_len)]
-        } else {
-            list()
-        }
-    })
-    b_list <- list("att" = convert_attention_matrix(b_att_mat),
-                   "top_text" = split_seq$b_text,
-                   "bot_text" = split_seq$b_text)
-
-    ab_att_mat <- purrr::map(all_att_mat, function(att_ten) {
-        if (b_len > 0 ) {
-            att_ten[ , 1:a_len, (a_len+1):(a_len+b_len)]
-        } else {
-            list()
-        }
-    })
-    ab_list <- list("att" = convert_attention_matrix(ab_att_mat),
-                    "top_text" = split_seq$a_text,
-                    "bot_text" = split_seq$b_text)
-
-    ba_att_mat <- purrr::map(all_att_mat, function(att_ten) {
-        if (b_len > 0 ) {
-            att_ten[ , (a_len+1):(a_len+b_len), 1:a_len]
-        } else {
-            list()
-        }
-    })
-    ba_list <- list("att" = convert_attention_matrix(ba_att_mat),
-                    "top_text" = split_seq$b_text,
-                    "bot_text" = split_seq$a_text)
-    ret_list <- list("all" = all_list,
-                     "a" = a_list,
-                     "b" = b_list,
-                     "ab" = ab_list,
-                     "ba" = ba_list)
-    return(ret_list)
+  return(
+    list(
+      all = list(
+        att = .enlist_attention(this_seq_data, c(1, 2), c(1, 2)),
+        top_text = as.list(token_list),
+        bot_text = as.list(token_list)
+      ),
+      a = list(
+        att = .enlist_attention(this_seq_data, 1, 1),
+        top_text = as.list(token_list_a),
+        bot_text = as.list(token_list_a)
+      ),
+      b = list(
+        att = .enlist_attention(this_seq_data, 2, 2),
+        top_text = as.list(token_list_b),
+        bot_text = as.list(token_list_b)
+      ),
+      ab = list(
+        att = .enlist_attention(this_seq_data, 1, 2),
+        top_text = as.list(token_list_a),
+        bot_text = as.list(token_list_b)
+      ),
+      ba = list(
+        att = .enlist_attention(this_seq_data, 2, 1),
+        top_text = as.list(token_list_b),
+        bot_text = as.list(token_list_a)
+      )
+    )
+  )
 }
 
-
-# convert_attention_matrix ----------------------------------------------------
-
-#' Restructure Attention Data
+#' Convert an Attention df to a List
 #'
-#' Converts a list of attention tensors to the nested list format required
-#' downstream.
+#' @param attention_tibble A tibble of attention, with minimal columns
+#'   layer_index, head_index, token_index, attention_token_index, and
+#'   attention_weight.
+#' @param top_segment_index Integer; the index of the first/top segment for this
+#'   set. Can be a vector (ie, \code{c(1, 2)} for "all").
+#' @param bottom_segment_index Integer; the index of the second/bottom segment
+#'   for this set. Can be a vector (ie, \code{c(1, 2)} for "all").
 #'
-#' @param att_ten_list List of numerical tensors of attention weights. Expected
-#'   structure: \code{[layer_index][head_index, token_from_index,
-#'   token_to_index]}
-#'
-#' @return The input attention weights, restructured as nested lists.
+#' @return A list as expected by \code{\link{.format_attention}}.
 #' @keywords internal
-convert_attention_matrix <- function(att_ten_list) {
-    att_ten_list <- unname(att_ten_list)
-    att_list <- purrr::map(att_ten_list, function(this_tensor) {
-        # this_tensor should be 3-dimensional, or else empty.
-        if (length(dim(this_tensor)) != 3) {
-            return(list())
+.enlist_attention <- function(attention_tibble,
+                              top_segment_index,
+                              bottom_segment_index) {
+  return(
+    attention_tibble %>%
+      dplyr::filter(
+        segment_index %in% top_segment_index,
+        attention_segment_index %in% bottom_segment_index
+      ) %>%
+      dplyr::select(
+        layer_index,
+        head_index,
+        token_index,
+        attention_token_index,
+        attention_weight
+      ) %>%
+      tidyr::nest(
+        target_weights = c(attention_token_index, attention_weight)
+      ) %>%
+      tidyr::nest(token_weights = c(token_index, target_weights)) %>%
+      tidyr::nest(head_weights = c(head_index, token_weights)) %>%
+      dplyr::pull(head_weights) %>%
+      purrr::map(
+        function(this_head) {
+          purrr::map(
+            this_head$token_weights,
+            function(this_token) {
+              purrr::map(
+                this_token$target_weights,
+                function(this_target) {
+                  as.list(this_target$attention_weight)
+                }
+              )
+            }
+          )
         }
-
-        # Reverse the order of the dimensions
-        this_tensor <- aperm(this_tensor)
-
-        # Count the matrices.
-        third_dimension <- dim(this_tensor)[[3]]
-        purrr::map(seq_len(third_dimension), function(i) {
-            # We want it to be a list of lists of lists. A data.frame is really
-            # close to that.
-            this_list <- this_tensor[,,i] %>%
-                as.data.frame() %>%
-                dplyr::mutate_all(as.list) %>%
-                unclass() %>%
-                unname()
-            attr(this_list, "row.names") <- NULL
-            return(this_list)
-        })
-    })
-    return(att_list)
+      )
+  )
 }
 
-
-# split_sequences ---------------------------------------------------------
-
-#' Split a Token Sequence
+#' Pull the Designated Tokens from the Attention tibble
 #'
-#' Splits a sequence of tokens on the first \code{"[SEP]"} token. Everything
-#' up to and including the first \code{"[SEP]"} is in the first segment,
-#' everything following is in the second.
+#' @param attention The attention component from
+#'   \code{\link[RBERT]{extract_features}(..., features = "attention")}.
+#' @param this_segment_index The segment to pull.
 #'
-#' @param token_list List of tokens.
-#'
-#' @return Two lists of tokens, divided on the first \code{"[SEP]"} token.
+#' @return A character vector of tokens.
 #' @keywords internal
-split_sequences <- function(token_list) {
-    sep_tok <- "[SEP]"
-    first_sep <- token_list == sep_tok
-    sep_index <- min(which(first_sep))
-    first_seg <- as.list(token_list[seq_len(sep_index)])
-    if (sep_index < length(token_list)) {
-        second_seg <- as.list(token_list[(sep_index+1):length(token_list)])
-    } else {
-        second_seg <- list()
-    }
-    return(list("a_text" = first_seg,
-                "b_text" = second_seg))
+.get_attention_tokens <- function(attention, this_segment_index) {
+  return(
+    attention %>%
+      dplyr::filter(
+        layer_index == min(layer_index),
+        head_index == min(head_index),
+        attention_token_index == min(attention_token_index),
+        segment_index == this_segment_index
+      ) %>%
+      dplyr::arrange(token_index) %>%
+      dplyr::pull(token)
+  )
 }

@@ -19,7 +19,10 @@
 #' Given data from an RBERT model, display an interactive visualization of the
 #' attention weights.
 #'
-#' @param attn_obj Output from \code{format_attention()} (details to come).
+#' @param attention The "attention" component of the output from
+#'   \code{\link[RBERT]{extract_features}(..., features = "attention")}.
+#' @param sequence_index Integer; which example sequence from the input to
+#'   visualize.
 #' @param height,width  Characters; height and width of the htmlwidget
 #'          specified in any valid \code{CSS} size unit.
 #' @param elementId Character; a valid \code{CSS} element id.
@@ -32,30 +35,29 @@
 #' # assuming something like the following has been run:
 #' # feats <- RBERT::extract_features(...) # See RBERT documentation
 #' # Then:
-#' attn <- format_attention(feats$attention_probs)
-#' visualize_attention(attn)
+#' visualize_attention(feats$attention)
 #' }
-visualize_attention <- function(attn_obj,
+visualize_attention <- function(attention,
+                                sequence_index = 1,
                                 width = NULL,
                                 height = NULL,
                                 elementId = NULL) {
+  attn_obj <- .format_attention(attention, sequence_index)
 
-    # x <- jsonlite::read_json("sample_json.txt")
-
-    # create widget
-    htmlwidgets::createWidget(
-        name = 'visualize_attention',
-        x = attn_obj,
-        width = width,
-        height = height,
-        package = 'RBERTviz',
-        elementId = elementId,
-        # The unlist weirdness is because the r2d3 function already wraps its
-        # return in a list.
-        dependencies = list(unlist(r2d3::html_dependencies_d3(version = "3"),
-                                   recursive = FALSE),
-                            rmarkdown::html_dependency_jquery())
-    )
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'visualize_attention',
+    x = attn_obj,
+    width = width,
+    height = height,
+    package = 'RBERTviz',
+    elementId = elementId,
+    # The unlist weirdness is because the r2d3 function already wraps its
+    # return in a list.
+    dependencies = list(unlist(r2d3::html_dependencies_d3(version = "3"),
+                               recursive = FALSE),
+                        rmarkdown::html_dependency_jquery())
+  )
 }
 
 
@@ -81,12 +83,12 @@ visualize_attention <- function(attn_obj,
 #' @export
 visualize_attentionOutput <- function(outputId,
                                       width = '100%', height = '400px'){
-    # nocov start
-    htmlwidgets::shinyWidgetOutput(outputId,
-                                   'visualize_attention',
-                                   width, height,
-                                   package = 'RBERTviz')
-    # nocov end
+  # nocov start
+  htmlwidgets::shinyWidgetOutput(outputId,
+                                 'visualize_attention',
+                                 width, height,
+                                 package = 'RBERTviz')
+  # nocov end
 }
 
 #' @rdname visualize_attention-shiny
@@ -94,14 +96,14 @@ visualize_attentionOutput <- function(outputId,
 renderVisualize_attention <- function(expr,
                                       env = parent.frame(),
                                       quoted = FALSE) {
-    # nocov start
+  # nocov start
 
-    if (!quoted) { expr <- substitute(expr) } # force quoted
-    htmlwidgets::shinyRenderWidget(expr,
-                                   visualize_attentionOutput,
-                                   env,
-                                   quoted = TRUE)
-    # nocov end
+  if (!quoted) { expr <- substitute(expr) } # force quoted
+  htmlwidgets::shinyRenderWidget(expr,
+                                 visualize_attentionOutput,
+                                 env,
+                                 quoted = TRUE)
+  # nocov end
 }
 
 
@@ -125,8 +127,8 @@ renderVisualize_attention <- function(expr,
 #'   properly formatted html, as a string.
 #' @keywords internal
 visualize_attention_html <- function(id, style, class, ...) {
-    # nocov start
-    html_str <- '<span style="user-select:none">
+  # nocov start
+  html_str <- '<span style="user-select:none">
                 Layer: <select id="layer"></select>
                     Attention: <select id="att_type">
                         <option value="all">All</option>
@@ -137,8 +139,8 @@ visualize_attention_html <- function(id, style, class, ...) {
                     </select>
                 </span>
                 <div id="vis"></div>'
-    htmltools::tags$span(id = id, class = class, htmltools::HTML(html_str))
-    # nocov end
+  htmltools::tags$span(id = id, class = class, htmltools::HTML(html_str))
+  # nocov end
 }
 
 

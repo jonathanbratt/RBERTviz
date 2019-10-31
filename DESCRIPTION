@@ -1,7 +1,7 @@
 Package: RBERTviz
 Type: Package
 Title: Visualization Tools for RBERT
-Version: 0.1.7
+Version: 0.1.8
 Authors@R: c(
     person("Jonathan", "Bratt", email = "jonathan.bratt@macmillan.com", 
            role = c("aut", "cre", "trl")
@@ -35,9 +35,10 @@ Imports:
     r2d3 (>= 0.2.3),
     RColorBrewer (>= 1.1.2),
     rmarkdown (>= 1.14),
-    tibble (>= 2.1.3)
+    tibble (>= 2.1.3),
+    tidyr (>= 1.0.0)
 Suggests:
-    RBERT (>= 0.1.7),
+    RBERT (>= 0.1.8),
     gganimate (>= 1.0.3),
     testthat (>= 2.1.0),
     useful (>= 1.2.6),
