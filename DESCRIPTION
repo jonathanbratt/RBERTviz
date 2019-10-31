@@ -18,7 +18,7 @@ Authors@R: c(
            comment = "Original tensor2tensor visualization code")
     )
 Description: Visualize attention weights and output vectors from BERT.
-Depends: R (>= 3.4)
+Depends: R (>= 3.5)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
