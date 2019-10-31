@@ -6,6 +6,7 @@ dist: trusty
 cache: packages
 latex: false
 fortran: false
+warnings_are_errors: false
 
 jobs:
   include:
@@ -15,9 +16,6 @@ jobs:
     after_success:
     - Rscript -e 'covr::codecov()'
   - r: 3.4
-  - r: 3.3
-  - r: 3.2
-    warnings_are_errors: false
   # - r: release
   #   env:
   #     - DEVEL_PACKAGES=true
