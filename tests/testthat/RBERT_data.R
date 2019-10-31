@@ -28,7 +28,9 @@ feats_chicken <- RBERT::extract_features(examples = chicken_ex,
                                          batch_size = 2L,
                                          features = c("output",
                                                       "attention"))
+# Save RDS version 2 so tests can run on R < 3.5.
 saveRDS(
   feats_chicken,
-  here::here("tests", "testthat", "feats_chicken.rds")
+  here::here("tests", "testthat", "feats_chicken.rds"),
+  version = 2
 )
