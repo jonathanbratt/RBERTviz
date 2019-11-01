@@ -8,7 +8,7 @@ keep_tokens(embedding_df, tokens = "[CLS]")
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of
-\code{\link[RBERT]{extract_featues}}.}
+\code{\link[RBERT]{extract_features}}.}
 
 \item{tokens}{Character vector; which tokens to keep.}
 }

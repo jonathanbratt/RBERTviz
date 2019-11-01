@@ -85,7 +85,7 @@ filter_layer_embeddings <- function(embedding_df,
 #' Keeps only specified tokens in the given table of embeddings.
 #'
 #' @param embedding_df A tbl_df of embedding vectors; the output of
-#'   \code{\link[RBERT]{extract_featues}}.
+#'   \code{\link[RBERT]{extract_features}}.
 #' @param tokens Character vector; which tokens to keep.
 #'
 #' @return The input tbl_df of embedding vectors, with the specified filtering
@@ -116,7 +116,7 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #' Display a 2D PCA plot of a collection of embedding vectors.
 #'
 #' @param embedding_df A tbl_df of embedding vectors; the output of
-#'   \code{\link[RBERT]{extract_featues}}.
+#'   \code{\link[RBERT]{extract_features}}.
 #' @param class Character vector; which tokens to keep.
 #' @param color_field Character scalar; optional column name to assign to color
 #'   aesthetic in the plot.

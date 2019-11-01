@@ -1,30 +1,38 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
+sudo: false
+dist: trusty
+cache: packages
+latex: false
+fortran: false
 warnings_are_errors: false
+
+jobs:
+  include:
+  - r: devel
+  - os: osx
+  - r: release
+    after_success:
+    - Rscript -e 'covr::codecov()'
+  # - r: release
+  #   env:
+  #     - DEVEL_PACKAGES=true
+  #   r_github_packages:
+  #     - RcppCore/Rcpp
+  #     - r-lib/rlang
+  #     - tidyverse/tibble
+  #     - tidyverse/tidyselect
+
+matrix:
+  fast_finish: true
+  # allow_failures:
+  # - env: DEVEL_PACKAGES=true
 
 env:
   global:
-    - TENSORFLOW_TEST_EXAMPLES="1"
-
-cache:
-  packages: true
-  directories:
-    - $HOME/.cache/pip
-
-addons:
-  apt:
-    packages:
-      python3-dev
-      python3-pip
-      python3-virtualenv
-      python3-venv
-
-before_script:
-  - python3 -m pip install --upgrade --ignore-installed --user travis virtualenv
-  - R CMD INSTALL .
-  - R -e 'tensorflow::install_tensorflow(version = "1.11.0", extra_packages="IPython")'
-  - R -e 'tensorflow::tf_config()'
-
-after_success:
-  - Rscript -e 'covr::codecov()'
+  - _R_CHECK_FORCE_SUGGESTS_=false
+  - MAKEFLAGS="-j 2"
+  - TRAVIS_CXXFLAGS="-Wall -Wextra -pedantic -Werror"
+  - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+  - _R_CHECK_SYSTEM_CLOCK_=FALSE
