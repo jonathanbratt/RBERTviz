@@ -388,7 +388,8 @@ HTMLWidgets.widget({
 
             $("#layer").empty();
             for(var i=0; i<num_layers; i++) {
-              $("#layer").append($("<option />").val(i).text(i));
+              // Edited display to start with 1, to be more Rtful. -JDB
+              $("#layer").append($("<option />").val(i).text(i+1));
             }
 
             $("#layer").on('change', function(e) {
