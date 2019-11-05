@@ -83,7 +83,7 @@ the token.
 
 
 Different attention heads capture different aspects of language. A particularly
-interesting example can be found in layer 10 of the BERT base (uncased) model,
+interesting example can be found in layer 11 of the BERT base (uncased) model,
 at the 9th head (4th box from the right). Consider the attention paid by the
 pronoun "it" in the first sentence above. Because "it" is tired, we easily
 understand that "it" refers to the chicken, not the road. This association is
