@@ -4,8 +4,12 @@
 \alias{display_pca}
 \title{Display PCA of Embeddings}
 \usage{
-display_pca(embedding_df, color_field = NULL,
-  disambiguate_tokens = TRUE, hide = NULL)
+display_pca(
+  embedding_df,
+  color_field = NULL,
+  disambiguate_tokens = TRUE,
+  hide = NULL
+)
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of
@@ -37,9 +41,9 @@ Display a 2D PCA plot of a collection of embedding vectors.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-feats$output \%>\%
-    filter_layer_embeddings(layer_indices = 12L) \%>\%
-    keep_tokens("[CLS]") \%>\%
+feats$output %>%
+    filter_layer_embeddings(layer_indices = 12L) %>%
+    keep_tokens("[CLS]") %>%
     display_pca()
 }
 }

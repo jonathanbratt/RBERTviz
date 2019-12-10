@@ -4,8 +4,7 @@
 \alias{filter_layer_embeddings}
 \title{Filter and Combine Embedding Vectors}
 \usage{
-filter_layer_embeddings(embedding_df, layer_indices = 12L,
-  sum_fun = mean)
+filter_layer_embeddings(embedding_df, layer_indices = 12L, sum_fun = mean)
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the "output" component of
@@ -35,17 +34,17 @@ layers.
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
 embeddings <- feats$output
-embeddings_layer1 <- embeddings \%>\%
+embeddings_layer1 <- embeddings %>%
     filter_layer_embeddings(layer_indices = 1L)
 # To keep the layer_index column, use sum_fun = NULL:
-embeddings_layer1b <- embeddings \%>\%
+embeddings_layer1b <- embeddings %>%
     filter_layer_embeddings(layer_indices = 1L, sum_fun = NULL)
 # Take the component-wise mean of the embeddings across layers 10-12.
-embeddings_layer_mean <- embeddings \%>\%
+embeddings_layer_mean <- embeddings %>%
     filter_layer_embeddings(layer_indices = 10:12)
 # Take the component-wise maximum of the embeddings across layers 8-12.
 # (Why would we do this? I don't know.)
-embeddings_layer_max <- embeddings \%>\%
+embeddings_layer_max <- embeddings %>%
     filter_layer_embeddings(layer_indices = 8:12, sum_fun = max)
 }
 }

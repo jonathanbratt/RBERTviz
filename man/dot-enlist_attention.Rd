@@ -4,8 +4,7 @@
 \alias{.enlist_attention}
 \title{Convert an Attention df to a List}
 \usage{
-.enlist_attention(attention_tibble, top_segment_index,
-  bottom_segment_index)
+.enlist_attention(attention_tibble, top_segment_index, bottom_segment_index)
 }
 \arguments{
 \item{attention_tibble}{A tibble of attention, with minimal columns
