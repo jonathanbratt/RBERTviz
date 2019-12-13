@@ -24,8 +24,8 @@ Keeps only specified tokens in the given table of embeddings.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-embeddings_layer12_cls <- feats$output %>%
-    filter_layer_embeddings(layer_indices = 12L) %>%
+embeddings_layer12_cls <- feats$output \%>\%
+    filter_layer_embeddings(layer_indices = 12L) \%>\%
     keep_tokens("[CLS]")
 }
 }

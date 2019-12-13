@@ -41,9 +41,9 @@ Display a 2D PCA plot of a collection of embedding vectors.
 # assuming something like the following has been run:
 # feats <- RBERT::extract_features(...) # See RBERT documentation
 # Then:
-feats$output %>%
-    filter_layer_embeddings(layer_indices = 12L) %>%
-    keep_tokens("[CLS]") %>%
+feats$output \%>\%
+    filter_layer_embeddings(layer_indices = 12L) \%>\%
+    keep_tokens("[CLS]") \%>\%
     display_pca()
 }
 }

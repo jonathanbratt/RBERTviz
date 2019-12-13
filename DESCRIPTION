@@ -24,7 +24,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jonathanbratt/RBERTviz
 BugReports: https://github.com/jonathanbratt/RBERTviz/issues
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.2
 Imports:
     dplyr (>= 0.8.3),
     ggplot2 (>= 3.2.1),
