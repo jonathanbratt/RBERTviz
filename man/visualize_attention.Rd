@@ -4,8 +4,13 @@
 \alias{visualize_attention}
 \title{Visualize BERT Attention Weights}
 \usage{
-visualize_attention(attention, sequence_index = 1, width = NULL,
-  height = NULL, elementId = NULL)
+visualize_attention(
+  attention,
+  sequence_index = 1,
+  width = NULL,
+  height = NULL,
+  elementId = NULL
+)
 }
 \arguments{
 \item{attention}{The "attention" component of the output from

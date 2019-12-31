@@ -4,8 +4,12 @@
 \alias{display_pca}
 \title{Display PCA of Embeddings}
 \usage{
-display_pca(embedding_df, color_field = NULL,
-  disambiguate_tokens = TRUE, hide = NULL)
+display_pca(
+  embedding_df,
+  color_field = NULL,
+  disambiguate_tokens = TRUE,
+  hide = NULL
+)
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the output of

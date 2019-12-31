@@ -4,8 +4,7 @@
 \alias{filter_layer_embeddings}
 \title{Filter and Combine Embedding Vectors}
 \usage{
-filter_layer_embeddings(embedding_df, layer_indices = 12L,
-  sum_fun = mean)
+filter_layer_embeddings(embedding_df, layer_indices = 12L, sum_fun = mean)
 }
 \arguments{
 \item{embedding_df}{A tbl_df of embedding vectors; the "output" component of

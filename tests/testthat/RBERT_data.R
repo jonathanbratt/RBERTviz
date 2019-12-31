@@ -6,11 +6,6 @@ BERT_PRETRAINED_DIR <- RBERT::download_BERT_checkpoint(
   model = "bert_base_uncased"
 )
 
-vocab_file <- file.path(BERT_PRETRAINED_DIR, 'vocab.txt')
-init_checkpoint <- file.path(BERT_PRETRAINED_DIR, 'bert_model.ckpt')
-bert_config_file <- file.path(BERT_PRETRAINED_DIR, 'bert_config.json')
-
-
 # First two examples are single-segment, third is two-segment.
 chicken <- list(
   "The chicken didn't cross the road, because it was too tired.",
@@ -21,9 +16,7 @@ chicken <- list(
 chicken_ex <- RBERT::make_examples_simple(chicken)
 
 feats_chicken <- RBERT::extract_features(examples = chicken_ex,
-                                         vocab_file = vocab_file,
-                                         bert_config_file = bert_config_file,
-                                         init_checkpoint = init_checkpoint,
+                                         ckpt_dir = BERT_PRETRAINED_DIR,
                                          layer_indexes = 0:12,
                                          batch_size = 2L,
                                          features = c("output",
