@@ -126,8 +126,6 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #'   aesthetic in the plot.
 #' @param disambiguate_tokens Logical; whether to append example and token
 #'   index to the literal token for display purposes.
-#' @param hide Deprecated. Use \code{project_vectors} to specify a set of
-#'   vectors for the PCA calculation.
 #'
 #' @return A ggplot2 plot of the embedding vectors projected onto two principal
 #'   axes.
@@ -146,13 +144,7 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 display_pca <- function(embedding_df,
                         project_vectors = embedding_df,
                         color_field = NULL,
-                        disambiguate_tokens = TRUE,
-                        hide = NULL) {
-  if (!is.null(hide)) {
-    warning("`hide` has been deprecated. Use `project_vectors` to specify ",
-            "which vectors to use for the PCA calculation.")
-  }
-
+                        disambiguate_tokens = TRUE) {
   pca_df <- do_pca(embedding_df = embedding_df,
                    project_vectors = project_vectors,
                    color_field = color_field,

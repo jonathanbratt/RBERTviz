@@ -8,8 +8,7 @@ display_pca(
   embedding_df,
   project_vectors = embedding_df,
   color_field = NULL,
-  disambiguate_tokens = TRUE,
-  hide = NULL
+  disambiguate_tokens = TRUE
 )
 }
 \arguments{
@@ -26,9 +25,6 @@ aesthetic in the plot.}
 
 \item{disambiguate_tokens}{Logical; whether to append example and token
 index to the literal token for display purposes.}
-
-\item{hide}{Deprecated. Use \code{project_vectors} to specify a set of
-vectors for the PCA calculation.}
 
 \item{class}{Character vector; which tokens to keep.}
 }
