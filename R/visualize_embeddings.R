@@ -223,9 +223,9 @@ do_pca <- function(embedding_df,
 
 #' Plot PCA
 #'
-#' Given the output of \code{prep_pca}, make the plot object.
+#' Given the output of \code{do_pca}, make the plot object.
 #'
-#' @param pca_df A tbl_df of pca vectors; output from a call to \code{prep_pca}.
+#' @param pca_df A tbl_df of pca vectors; output from a call to \code{do_pca}.
 #' @inheritParams display_pca
 #'
 #' @return A ggplot2 plot of the embedding vectors projected onto two principal
@@ -240,7 +240,7 @@ do_pca <- function(embedding_df,
 #' feats$output %>%
 #'     filter_layer_embeddings(layer_indices = 12L) %>%
 #'     keep_tokens("[CLS]") %>%
-#'     prep_pca() %>%
+#'     do_pca() %>%
 #'     plot_pca()
 #' }
 plot_pca <- function(pca_df,

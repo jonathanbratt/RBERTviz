@@ -7,7 +7,7 @@
 plot_pca(pca_df, color_field = NULL)
 }
 \arguments{
-\item{pca_df}{A tbl_df of pca vectors; output from a call to \code{prep_pca}.}
+\item{pca_df}{A tbl_df of pca vectors; output from a call to \code{do_pca}.}
 
 \item{color_field}{Character scalar; optional column name to assign to color
 aesthetic in the plot.}
@@ -17,7 +17,7 @@ A ggplot2 plot of the embedding vectors projected onto two principal
   axes.
 }
 \description{
-Given the output of \code{prep_pca}, make the plot object.
+Given the output of \code{do_pca}, make the plot object.
 }
 \examples{
 \dontrun{
@@ -27,7 +27,7 @@ Given the output of \code{prep_pca}, make the plot object.
 feats$output \%>\%
     filter_layer_embeddings(layer_indices = 12L) \%>\%
     keep_tokens("[CLS]") \%>\%
-    prep_pca() \%>\%
+    do_pca() \%>\%
     plot_pca()
 }
 }
