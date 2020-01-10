@@ -216,14 +216,15 @@ different, reflecting the different antecedents in the two sentences. It is
 satisfying that each pronoun vector is closest to the "correct" noun
 vector in this plot.
 
-Finally, we may sometimes wish to hide certain points on the plot (e.g. for
+Finally, we may sometimes wish to apply the same PCA projection to different
+sets of plotted vectors (e.g. to selectively hide certain points for emphasis or
 dramatic effect on a presentation). Removing rows from the dataframe before
 running the PCA will result in a different set of basis vectors, and may change
 the details of the arrangement drastically. To provide more control, the
 `project_vectors` parameter of `display_pca` allows you to separately specify an
-embedding dataframe to be used for calculating the PCA projection matrix.
-(You may need to manually specify the coordinate limits, since ggplot picked
-those automatically, and will truncate the range if edge points are hidden.)
+embedding dataframe to be used for calculating the PCA projection matrix. (You
+may need to manually specify the coordinate limits, since ggplot picks those
+automatically, and will truncate the range if edge points are hidden.)
 
 ```{r, eval=FALSE}
 embeddings_l12_select_it_removed <- embeddings_l12_select %>% 
