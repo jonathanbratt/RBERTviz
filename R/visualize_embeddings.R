@@ -187,9 +187,9 @@ display_pca <- function(embedding_df,
 #'     do_pca()
 #' }
 do_pca <- function(embedding_df,
-                        project_vectors = embedding_df,
-                        color_field = NULL,
-                        disambiguate_tokens = TRUE) {
+                   project_vectors = embedding_df,
+                   color_field = NULL,
+                   disambiguate_tokens = TRUE) {
   num_rows <- nrow(embedding_df)
   num_rows_proj <- nrow(project_vectors)
   if (num_rows_proj < 3) {
@@ -219,8 +219,8 @@ do_pca <- function(embedding_df,
     dplyr::select(embedding_df,
                   dplyr::matches("V[0-9]+"))
   )
-  # Instead of doing PCA here, do the scaling and projection manually.
-  vec_mat <- scale(vec_mat, center = TRUE, scale = TRUE)
+  # Instead of doing PCA here, apply the scaling and projection manually.
+  vec_mat <- scale(vec_mat, center = pcs$center, scale = pcs$scale)
   projected <- vec_mat %*% pcs$rotation
 
   pca_df <- dplyr::bind_cols(tok_labels, tibble::as_tibble(projected))
