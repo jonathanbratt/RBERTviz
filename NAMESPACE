@@ -2,8 +2,10 @@
 
 export("%>%")
 export(display_pca)
+export(do_pca)
 export(filter_layer_embeddings)
 export(keep_tokens)
+export(plot_pca)
 export(renderVisualize_attention)
 export(visualize_attention)
 export(visualize_attentionOutput)

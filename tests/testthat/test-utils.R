@@ -148,14 +148,13 @@ test_that("format_attention and visualize_attention works", {
                                                    color_field = "typo"),
                            "not found")
 
-  pca_plot <- display_pca(embeddings, hide = c(FALSE, FALSE, FALSE,
-                                               FALSE, FALSE, FALSE,
-                                               TRUE, TRUE))
-  testthat::expect_equal(length(pca_plot$data$token), 6)
+  # pca_plot <- display_pca(embeddings, hide = c(FALSE, FALSE, FALSE,
+  #                                              FALSE, FALSE, FALSE,
+  #                                              TRUE, TRUE))
+  # testthat::expect_equal(length(pca_plot$data$token), 6)
   testthat::expect_warning(pca_plot <- display_pca(embeddings,
-                                                   hide = c(FALSE, FALSE,
-                                                            TRUE, TRUE)),
-                           "ignored")
+                                                   hide = "anything"),
+                           "deprecated")
 
   # A package update mysteriously broke the visualization display. Installing
   # (but not necessarily keeping) an old version of Rcpp seemed to fix it. If

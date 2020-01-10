@@ -57,20 +57,20 @@
 filter_layer_embeddings <- function(embedding_df,
                                     layer_indices = 12L,
                                     sum_fun = mean) {
-    layers_filtered <- dplyr::filter(embedding_df,
-                                     layer_index %in% layer_indices)
+  layers_filtered <- dplyr::filter(embedding_df,
+                                   layer_index %in% layer_indices)
 
-    if (is.null(sum_fun)) {
-        return(layers_filtered)
-    }
+  if (is.null(sum_fun)) {
+    return(layers_filtered)
+  }
 
-    layers_combined <- layers_filtered %>%
-        dplyr::group_by(sequence_index, segment_index, token_index, token)
-    layers_combined <- layers_combined %>%
-        dplyr::summarize_at(.vars = dplyr::vars(dplyr::matches("V[0-9]+")),
-                            .funs = sum_fun) %>%
-        dplyr::ungroup()
-    return(layers_combined)
+  layers_combined <- layers_filtered %>%
+    dplyr::group_by(sequence_index, segment_index, token_index, token)
+  layers_combined <- layers_combined %>%
+    dplyr::summarize_at(.vars = dplyr::vars(dplyr::matches("V[0-9]+")),
+                        .funs = sum_fun) %>%
+    dplyr::ungroup()
+  return(layers_combined)
 }
 
 # feats_com <- combine_layer_embeddings(vecs_df, 10:12)
@@ -102,9 +102,9 @@ filter_layer_embeddings <- function(embedding_df,
 #'     keep_tokens("[CLS]")
 #' }
 keep_tokens <- function(embedding_df, tokens = "[CLS]") {
-    filtered_df <- dplyr::filter(embedding_df,
-                                 token %in% tokens)
-    return(filtered_df)
+  filtered_df <- dplyr::filter(embedding_df,
+                               token %in% tokens)
+  return(filtered_df)
 }
 
 
@@ -115,18 +115,19 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #'
 #' Display a 2D PCA plot of a collection of embedding vectors.
 #'
-#' @param embedding_df A tbl_df of embedding vectors; the output of
+#' @param embedding_df A tbl_df of embedding vectors; from the output of
 #'   \code{\link[RBERT]{extract_features}}.
+#' @param project_vectors A tbl_df of embedding vectors to be used for
+#'   calculating the PCA projection matrix. Defaults to \code{embedding_df}.
+#'   This makes it possible to more consistently select the PCA "perspective",
+#'   even as the set of vectors may change.
 #' @param class Character vector; which tokens to keep.
 #' @param color_field Character scalar; optional column name to assign to color
 #'   aesthetic in the plot.
 #' @param disambiguate_tokens Logical; whether to append example and token
 #'   index to the literal token for display purposes.
-#' @param hide Optional logical vector of same length as
-#'   \code{nrow(embedding_df)}; if present, only rows corresponding to TRUE will
-#'   be displayed on the plot (all rows will still be used in the computation of
-#'   the plot). This makes it easy to selectively display points without
-#'   redefining the principal axes.
+#' @param hide Deprecated. Use \code{project_vectors} to specify a set of
+#'   vectors for the PCA calculation.
 #'
 #' @return A ggplot2 plot of the embedding vectors projected onto two principal
 #'   axes.
@@ -143,77 +144,150 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #'     display_pca()
 #' }
 display_pca <- function(embedding_df,
+                        project_vectors = embedding_df,
                         color_field = NULL,
                         disambiguate_tokens = TRUE,
                         hide = NULL) {
-    num_rows <- nrow(embedding_df)
-    if (num_rows < 3) {
-        stop("At least three vectors are required for a ",
-                "meaningful PCA plot.")
-    }
-    if (disambiguate_tokens) {
-        embedding_df <- dplyr::mutate(embedding_df,
-                                      token = paste(token,
-                                                    sequence_index,
-                                                    token_index,
-                                                    sep = "."))
-    }
-    # Just keep all the non-vector columns, for possible use in plotting.
-    tok_labels <- dplyr::select(embedding_df,
-                                -dplyr::matches("V[0-9]+"))
+  if (!is.null(hide)) {
+    warning("`hide` has been deprecated. Use `project_vectors` to specify ",
+            "which vectors to use for the PCA calculation.")
+  }
 
-    vec_mat <- as.matrix(
-        dplyr::select(embedding_df,
-                      dplyr::matches("V[0-9]+"))
-    )
-    pcs <- stats::prcomp(vec_mat,
-                         retx = TRUE, center = TRUE, scale. = TRUE, rank. = 2L)
-    pc_tbl <- dplyr::bind_cols(tok_labels, tibble::as_tibble(pcs$x))
-
-    class <- rep("a", num_rows)
-    if (!is.null(color_field)) {
-        if (color_field %in% names(embedding_df)) {
-            class <- dplyr::pull(
-                dplyr::select(embedding_df, dplyr::one_of(color_field))
-            )
-        } else {
-            warning("Column ", color_field, " not found in input table." )
-        }
-    }
-    class <- as.factor(class)
-
-    unique_classes <- unique(class)
-    num_class <- length(unique_classes)
-    getPalette <- grDevices::colorRampPalette(
-        RColorBrewer::brewer.pal(8, "Dark2")
-    )
-    pal <- getPalette(num_class)
-    class_colors <- pal
-    names(class_colors) <- unique_classes
-
-    if (!is.null(hide)) {
-        if (length(hide) == nrow(pc_tbl)) {
-            pc_tbl <- pc_tbl[!hide, ]
-            class <- class[!hide]
-        } else {
-            warning("Length of hide parameter doesn't match size of ",
-                    "input table, and will be ignored.")
-        }
-    }
-
-    ggp <- ggplot2::ggplot(pc_tbl, ggplot2::aes(x = PC1, y = PC2,
-                              label = token,
-                              col = class)) +
-        ggplot2::scale_color_manual(values = class_colors,
-                           name = color_field) +
-        ggplot2::geom_text(vjust = 0, nudge_y = 0.5) +
-        ggplot2::geom_point()
-    if (num_class <= 1) {
-        ggp <- ggp + ggplot2::theme(legend.position = "none")
-    }
-    return(ggp)
+  pca_df <- do_pca(embedding_df = embedding_df,
+                   project_vectors = project_vectors,
+                   color_field = color_field,
+                   disambiguate_tokens = disambiguate_tokens)
+  return(
+    plot_pca(pca_df = pca_df,
+             color_field = color_field)
+  )
 }
 
+# do_pca -------------------------------------------------------------
 
+#' Do PCA on Embeddings
+#'
+#' Calculate the 2D PCA for a collection of embedding vectors, in preparation
+#' for plotting.
+#'
+#' @inheritParams display_pca
+#'
+#' @return A tbl_df of the embedding vectors projected onto two principal
+#'   axes.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # assuming something like the following has been run:
+#' # feats <- RBERT::extract_features(...) # See RBERT documentation
+#' # Then:
+#' pca_df <- feats$output %>%
+#'     filter_layer_embeddings(layer_indices = 12L) %>%
+#'     keep_tokens("[CLS]") %>%
+#'     do_pca()
+#' }
+do_pca <- function(embedding_df,
+                        project_vectors = embedding_df,
+                        color_field = NULL,
+                        disambiguate_tokens = TRUE) {
+  num_rows <- nrow(embedding_df)
+  num_rows_proj <- nrow(project_vectors)
+  if (num_rows_proj < 3) {
+    stop("At least three vectors are required for a ",
+         "meaningful PCA plot.")
+  }
+  # Use just the indicated vectors to select the PCA projection.
+  proj_mat <- as.matrix(
+    dplyr::select(project_vectors,
+                  dplyr::matches("V[0-9]+"))
+  )
+  pcs <- stats::prcomp(proj_mat,
+                       retx = TRUE, center = TRUE, scale. = TRUE, rank. = 2L)
+
+  if (disambiguate_tokens) {
+    embedding_df <- dplyr::mutate(embedding_df,
+                                  token = paste(token,
+                                                sequence_index,
+                                                token_index,
+                                                sep = "."))
+  }
+  # Keep all the non-vector columns, for possible use in plotting.
+  tok_labels <- dplyr::select(embedding_df,
+                              -dplyr::matches("V[0-9]+"))
+
+  vec_mat <- as.matrix(
+    dplyr::select(embedding_df,
+                  dplyr::matches("V[0-9]+"))
+  )
+  # Instead of doing PCA here, do the scaling and projection manually.
+  vec_mat <- scale(vec_mat, center = TRUE, scale = TRUE)
+  projected <- vec_mat %*% pcs$rotation
+
+  pca_df <- dplyr::bind_cols(tok_labels, tibble::as_tibble(projected))
+  return(pca_df)
+}
+
+# plot_pca -------------------------------------------------------------
+
+#' Plot PCA
+#'
+#' Given the output of \code{prep_pca}, make the plot object.
+#'
+#' @param pca_df A tbl_df of pca vectors; output from a call to \code{prep_pca}.
+#' @inheritParams display_pca
+#'
+#' @return A ggplot2 plot of the embedding vectors projected onto two principal
+#'   axes.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # assuming something like the following has been run:
+#' # feats <- RBERT::extract_features(...) # See RBERT documentation
+#' # Then:
+#' feats$output %>%
+#'     filter_layer_embeddings(layer_indices = 12L) %>%
+#'     keep_tokens("[CLS]") %>%
+#'     prep_pca() %>%
+#'     plot_pca()
+#' }
+plot_pca <- function(pca_df,
+                     color_field = NULL) {
+  num_rows <- nrow(pca_df)
+
+  class <- rep("a", num_rows)
+  if (!is.null(color_field)) {
+    if (color_field %in% names(pca_df)) {
+      class <- dplyr::pull(
+        dplyr::select(pca_df, dplyr::one_of(color_field))
+      )
+    } else {
+      warning("Column ", color_field, " not found in input table." )
+    }
+  }
+  class <- as.factor(class)
+
+  unique_classes <- unique(class)
+  num_class <- length(unique_classes)
+  getPalette <- grDevices::colorRampPalette(
+    RColorBrewer::brewer.pal(8, "Dark2")
+  )
+
+  pal <- getPalette(num_class)
+  class_colors <- pal
+  names(class_colors) <- unique_classes
+
+  ggp <- ggplot2::ggplot(pca_df, ggplot2::aes(x = PC1, y = PC2,
+                                              label = token,
+                                              col = class)) +
+    ggplot2::scale_color_manual(values = class_colors,
+                                name = color_field) +
+    ggplot2::geom_text(vjust = 0, nudge_y = 0.5) +
+    ggplot2::geom_point()
+  if (num_class <= 1) {
+    ggp <- ggp + ggplot2::theme(legend.position = "none")
+  }
+  return(ggp)
+}
 
 
