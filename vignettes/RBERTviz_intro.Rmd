@@ -55,12 +55,9 @@ BERT_PRETRAINED_DIR <- RBERT::download_BERT_checkpoint(
 chicken <- c("The chicken didn't cross the road, because it was too tired.",
              "The chicken didn't cross the road, because it was too wide.")
 
-chicken_ex <- RBERT::make_examples_simple(chicken)
-
-feats_chicken <- RBERT::extract_features(examples = chicken_ex,
+feats_chicken <- RBERT::extract_features(examples = chicken,
                                          ckpt_dir = BERT_PRETRAINED_DIR,
                                          layer_indexes = 0:12,
-                                         batch_size = 2L,
                                          features = c("output",
                                                       "attention"))
 visualize_attention(feats_chicken$attention, sequence_index = 1)
@@ -110,12 +107,10 @@ segments in an example.
 ```{r, eval=FALSE}
 chicken2 <- list(c("The chicken didn't cross the road.", "It was too tired."),
                  c("The chicken didn't cross the road.", "It was too wide."))
-chicken_ex2 <- RBERT::make_examples_simple(chicken2)
 
-feats_chicken2 <- RBERT::extract_features(examples = chicken_ex2,
+feats_chicken2 <- RBERT::extract_features(examples = chicken2,
                                          ckpt_dir = BERT_PRETRAINED_DIR,
                                          layer_indexes = 1:12,
-                                         batch_size = 2L,
                                          features = c("output",
                                                       "attention"))
 visualize_attention(feats_chicken2$attention, sequence_index = 2)
@@ -224,15 +219,18 @@ vector in this plot.
 Finally, we may sometimes wish to hide certain points on the plot (e.g. for
 dramatic effect on a presentation). Removing rows from the dataframe before
 running the PCA will result in a different set of basis vectors, and may change
-the details of the arrangement drastically. To keep a point off the plot, while
-still using it to compute the PCA, use the `hide` parameter in `display_pca()`.
+the details of the arrangement drastically. To provide more control, the
+`project_vectors` parameter of `display_pca` allows you to separately specify an
+embedding dataframe to be used for calculating the PCA projection matrix.
 (You may need to manually specify the coordinate limits, since ggplot picked
 those automatically, and will truncate the range if edge points are hidden.)
 
 ```{r, eval=FALSE}
-display_pca(embeddings_l12_select, color_field = "class",
-            hide = c(FALSE, FALSE, TRUE,
-                     FALSE, FALSE, TRUE)) +
+embeddings_l12_select_it_removed <- embeddings_l12_select %>% 
+  dplyr::filter(token != "it")
+display_pca(embedding_df = embeddings_l12_select_it_removed,
+            project_vectors = embeddings_l12_select, 
+            color_field = "class") +
     ggplot2::ylim(-11, 26)
 ```
 
@@ -278,10 +276,9 @@ train_classes <- c("teach",
 
 # Run the sentences through a BERT model.
 feats_train <- RBERT::extract_features(
-    examples = RBERT::make_examples_simple(train_seq),
+    examples = train_seq,
     ckpt_dir = BERT_PRETRAINED_DIR,
-    layer_indexes = 0:12,
-    batch_size = 2L)
+    layer_indexes = 0:12)
 
 # Extract the feature vectors from the result.
 train_embeddings_df <- feats_train$output
@@ -330,7 +327,7 @@ columns of the input dataframe).
 
 ```{r, eval=FALSE}
 # just show a few selected layers
-layers_to_show <- c(0,6,12)
+layers_to_show <- c(0, 6, 12)
 n_layers <- length(layers_to_show)
 pca_plot <- train_embeddings_df %>% 
     filter_layer_embeddings(layer_indices = layers_to_show, 
