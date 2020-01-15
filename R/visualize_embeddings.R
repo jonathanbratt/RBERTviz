@@ -271,7 +271,7 @@ plot_pca <- function(pca_df,
 
   ggp <- ggplot2::ggplot(pca_df, ggplot2::aes(x = PC1, y = PC2,
                                               label = token,
-                                              col = class)) +
+                                              color = class)) +
     ggplot2::scale_color_manual(values = class_colors,
                                 name = color_field) +
     ggplot2::geom_text(vjust = 0, nudge_y = 0.5) +
