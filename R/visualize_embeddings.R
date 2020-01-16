@@ -147,7 +147,6 @@ display_pca <- function(embedding_df,
                         disambiguate_tokens = TRUE) {
   pca_df <- do_pca(embedding_df = embedding_df,
                    project_vectors = project_vectors,
-                   color_field = color_field,
                    disambiguate_tokens = disambiguate_tokens)
   return(
     plot_pca(pca_df = pca_df,
@@ -180,7 +179,6 @@ display_pca <- function(embedding_df,
 #' }
 do_pca <- function(embedding_df,
                    project_vectors = embedding_df,
-                   color_field = NULL,
                    disambiguate_tokens = TRUE) {
   num_rows <- nrow(embedding_df)
   num_rows_proj <- nrow(project_vectors)
@@ -216,6 +214,7 @@ do_pca <- function(embedding_df,
   projected <- vec_mat %*% pcs$rotation
 
   pca_df <- dplyr::bind_cols(tok_labels, tibble::as_tibble(projected))
+  class(pca_df) <- c("rbert_pca", class(pca_df)) # for autoplot later?
   return(pca_df)
 }
 
@@ -241,44 +240,47 @@ do_pca <- function(embedding_df,
 #'     filter_layer_embeddings(layer_indices = 12L) %>%
 #'     keep_tokens("[CLS]") %>%
 #'     do_pca() %>%
-#'     plot_pca()
+#'     autoplot()
 #' }
 plot_pca <- function(pca_df,
                      color_field = NULL) {
-  num_rows <- nrow(pca_df)
+  # Make the base ggplot object...
+  ggp <- ggplot2::ggplot(pca_df, ggplot2::aes(x = PC1, y = PC2,
+                                              label = token))
 
-  class <- rep("a", num_rows)
+  # ...iff `color_field` was specified, handle all the color stuff here...
   if (!is.null(color_field)) {
     if (color_field %in% names(pca_df)) {
-      class <- dplyr::pull(
+      # Avoid collisions with existing column names by explicitly specifying
+      # environment of variable passed to `aes`.
+      this_env <- new.env()
+      this_env$class <- dplyr::pull(
         dplyr::select(pca_df, dplyr::one_of(color_field))
       )
+      this_env$class <- as.factor(this_env$class)
+      unique_classes <- unique(this_env$class)
+      num_class <- length(unique_classes)
+      getPalette <- grDevices::colorRampPalette(
+        RColorBrewer::brewer.pal(8, "Dark2")
+      )
+
+      pal <- getPalette(num_class)
+      class_colors <- pal
+      names(class_colors) <- unique_classes
+      ggp <- ggp +
+        ggplot2::aes(color = this_env$class) +
+        ggplot2::scale_color_manual(values = class_colors,
+                                    name = color_field)
     } else {
       warning("Column ", color_field, " not found in input table." )
     }
   }
-  class <- as.factor(class)
 
-  unique_classes <- unique(class)
-  num_class <- length(unique_classes)
-  getPalette <- grDevices::colorRampPalette(
-    RColorBrewer::brewer.pal(8, "Dark2")
-  )
-
-  pal <- getPalette(num_class)
-  class_colors <- pal
-  names(class_colors) <- unique_classes
-
-  ggp <- ggplot2::ggplot(pca_df, ggplot2::aes(x = PC1, y = PC2,
-                                              label = token,
-                                              color = class)) +
-    ggplot2::scale_color_manual(values = class_colors,
-                                name = color_field) +
+  # ... finally, apply the geoms.
+  ggp <- ggp +
     ggplot2::geom_text(vjust = 0, nudge_y = 0.5) +
     ggplot2::geom_point()
-  if (num_class <= 1) {
-    ggp <- ggp + ggplot2::theme(legend.position = "none")
-  }
+
   return(ggp)
 }
 

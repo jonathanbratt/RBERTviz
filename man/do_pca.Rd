@@ -7,7 +7,6 @@
 do_pca(
   embedding_df,
   project_vectors = embedding_df,
-  color_field = NULL,
   disambiguate_tokens = TRUE
 )
 }
@@ -19,9 +18,6 @@ do_pca(
 calculating the PCA projection matrix. Defaults to \code{embedding_df}.
 This makes it possible to more consistently select the PCA "perspective",
 even as the set of vectors may change.}
-
-\item{color_field}{Character scalar; optional column name to assign to color
-aesthetic in the plot.}
 
 \item{disambiguate_tokens}{Logical; whether to append example and token
 index to the literal token for display purposes.}

@@ -28,6 +28,6 @@ feats$output \%>\%
     filter_layer_embeddings(layer_indices = 12L) \%>\%
     keep_tokens("[CLS]") \%>\%
     do_pca() \%>\%
-    plot_pca()
+    autoplot()
 }
 }
