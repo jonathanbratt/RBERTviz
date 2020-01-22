@@ -121,7 +121,6 @@ keep_tokens <- function(embedding_df, tokens = "[CLS]") {
 #'   calculating the PCA projection matrix. Defaults to \code{embedding_df}.
 #'   This makes it possible to more consistently select the PCA "perspective",
 #'   even as the set of vectors may change.
-#' @param class Character vector; which tokens to keep.
 #' @param color_field Character scalar; optional column name to assign to color
 #'   aesthetic in the plot.
 #' @param disambiguate_tokens Logical; whether to append example and token
@@ -149,8 +148,8 @@ display_pca <- function(embedding_df,
                    project_vectors = project_vectors,
                    disambiguate_tokens = disambiguate_tokens)
   return(
-    plot_pca(pca_df = pca_df,
-             color_field = color_field)
+    autoplot.rbert_pca(pca_df = pca_df,
+                       color_field = color_field)
   )
 }
 
@@ -214,17 +213,18 @@ do_pca <- function(embedding_df,
   projected <- vec_mat %*% pcs$rotation
 
   pca_df <- dplyr::bind_cols(tok_labels, tibble::as_tibble(projected))
-  class(pca_df) <- c("rbert_pca", class(pca_df)) # for autoplot later?
+  class(pca_df) <- c("rbert_pca", class(pca_df)) # for autoplot
   return(pca_df)
 }
 
-# plot_pca -------------------------------------------------------------
+# autoplot.rbert_pca ----------------------------------------------------------
 
 #' Plot PCA
 #'
 #' Given the output of \code{do_pca}, make the plot object.
 #'
-#' @param pca_df A tbl_df of pca vectors; output from a call to \code{do_pca}.
+#' @param pca_df A tbl_df of pca vectors with class "rbert_pca"; output from a
+#'   call to \code{do_pca}.
 #' @inheritParams display_pca
 #'
 #' @return A ggplot2 plot of the embedding vectors projected onto two principal
@@ -242,8 +242,8 @@ do_pca <- function(embedding_df,
 #'     do_pca() %>%
 #'     autoplot()
 #' }
-plot_pca <- function(pca_df,
-                     color_field = NULL) {
+autoplot.rbert_pca <- function(pca_df,
+                               color_field = NULL) {
   # Make the base ggplot object...
   ggp <- ggplot2::ggplot(pca_df, ggplot2::aes(x = PC1, y = PC2,
                                               label = token))

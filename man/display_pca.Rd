@@ -25,8 +25,6 @@ aesthetic in the plot.}
 
 \item{disambiguate_tokens}{Logical; whether to append example and token
 index to the literal token for display purposes.}
-
-\item{class}{Character vector; which tokens to keep.}
 }
 \value{
 A ggplot2 plot of the embedding vectors projected onto two principal

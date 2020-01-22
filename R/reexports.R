@@ -24,3 +24,9 @@
 #' @param lhs,rhs A vector of fields or a tibble of fields and values, and a
 #'   function to apply to them.
 NULL
+
+
+
+#' @importFrom ggplot2 autoplot
+#' @export
+ggplot2::autoplot
