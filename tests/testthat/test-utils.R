@@ -155,9 +155,12 @@ test_that("format_attention and visualize_attention works", {
                               class = c("bird", "road", "bird",
                                         "bird", "thing", "road",
                                         "bird", "road"))
-  display_pca(embeddings3, color_field = "b_or_r")
   pca_plot <- display_pca(embeddings3, color_field = "b_or_r")
   testthat::expect_error(print(pca_plot), NA) # ~ "expect_no_error"
+
+  # The print statement above creates a file "Rplots.pdf" in the testthat
+  # directory. Let's clean up.
+  file.remove("Rplots.pdf")
 
   # A package update mysteriously broke the visualization display. Installing
   # (but not necessarily keeping) an old version of Rcpp seemed to fix it. If
