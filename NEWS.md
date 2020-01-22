@@ -2,7 +2,8 @@
 
 * Added a `project_vectors` parameter to `display_pca`, to allow users to
 specify a set of vectors for calculating the PCA, independent from the vectors
-plotted.
+plotted. 
+* The parameter `hide` has been removed from `display_pca`.
 
 # RBERTviz 0.1.9
 
