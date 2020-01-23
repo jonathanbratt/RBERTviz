@@ -15,7 +15,9 @@
 test_that("format_attention and visualize_attention works", {
   # See RBERT_data.R for how feats_chicken is created.
 
-  # feats_chicken <- here::here("tests", "testthat", "feats_chicken.rds")
+  # feats_chicken <- readRDS(
+  #   here::here("tests", "testthat", "feats_chicken.rds")
+  # )
   # Goodpractice doesn't like here, so also provide a path for that, and
   # comment out the more convenient here version.
   feats_chicken <- readRDS("feats_chicken.rds")
@@ -128,7 +130,7 @@ test_that("format_attention and visualize_attention works", {
 
   pca_plot <- display_pca(embeddings)
   testthat::expect_identical(as.character(pca_plot$labels),
-                             c("PC1", "PC2", "token", "class"))
+                             c("PC1", "PC2", "token"))
   testthat::expect_equal(length(pca_plot$data$token), 8)
 
   embeddings2 <- keep_tokens(embeddings, c("it"))
@@ -147,15 +149,18 @@ test_that("format_attention and visualize_attention works", {
   testthat::expect_warning(pca_plot <- display_pca(embeddings,
                                                    color_field = "typo"),
                            "not found")
+  # Test against bug. Should not be a collision if "class" is already a field.
+  embeddings3 <- dplyr::mutate(embeddings,
+                              b_or_r = "thing",
+                              class = c("bird", "road", "bird",
+                                        "bird", "thing", "road",
+                                        "bird", "road"))
+  pca_plot <- display_pca(embeddings3, color_field = "b_or_r")
+  testthat::expect_error(print(pca_plot), NA) # ~ "expect_no_error"
 
-  pca_plot <- display_pca(embeddings, hide = c(FALSE, FALSE, FALSE,
-                                               FALSE, FALSE, FALSE,
-                                               TRUE, TRUE))
-  testthat::expect_equal(length(pca_plot$data$token), 6)
-  testthat::expect_warning(pca_plot <- display_pca(embeddings,
-                                                   hide = c(FALSE, FALSE,
-                                                            TRUE, TRUE)),
-                           "ignored")
+  # The print statement above creates a file "Rplots.pdf" in the testthat
+  # directory. Let's clean up.
+  file.remove("Rplots.pdf")
 
   # A package update mysteriously broke the visualization display. Installing
   # (but not necessarily keeping) an old version of Rcpp seemed to fix it. If
