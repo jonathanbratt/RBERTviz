@@ -52,10 +52,9 @@ visualize_attention <- function(attention,
     height = height,
     package = 'RBERTviz',
     elementId = elementId,
-    # The unlist weirdness is because the r2d3 function already wraps its
+    # The [[1]] weirdness is because the r2d3 function already wraps its
     # return in a list.
-    dependencies = list(unlist(r2d3::html_dependencies_d3(version = "3"),
-                               recursive = FALSE),
+    dependencies = list(r2d3::html_dependencies_d3(version = "3")[[1]],
                         rmarkdown::html_dependency_jquery())
   )
 }
