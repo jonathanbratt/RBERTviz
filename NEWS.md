@@ -1,3 +1,7 @@
+# RBERTviz 0.1.12
+
+* Fixed bug due to htmltools update.
+
 # RBERTviz 0.1.11
 
 * Added a `project_vectors` parameter to `display_pca`, to allow users to
